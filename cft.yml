@@ -1,3 +1,6 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create VPC, Subnet, EC2 Instance, Security Group, Internet Gateway, and Route Table
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -19,7 +22,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      AvailabilityZone: !Select  [ 0, !GetAZs '' ]
       CidrBlock: 10.0.0.0/19
   
   SecurityGroup:
@@ -49,3 +52,11 @@ Resources:
           GroupSet:
             - !Ref SecurityGroup
           AssociatePublicIpAddress: true
+      UserData: !Base64 |
+        #!/bin/bash
+        sudo -i 
+        yum update all
+        yum install httpd -y
+        systemctl start httpd
+        systemctl enable httpd
+        echo "this instane made with the help of cft using jenkins pipeline" > /var/www/html/index.html
